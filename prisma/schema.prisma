@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  attempts  Attempt[]
+}
+
+model Attempt {
+  id            String       @id @default(cuid())
+  sessionId     String
+  session       Session      @relation(fields: [sessionId], references: [id])
+  learnerStates LearnerState[]
+  createdAt     DateTime     @default(now())
+}
+
+model LearnerState {
+  id        String   @id @default(cuid())
+  attemptId String
+  attempt   Attempt  @relation(fields: [attemptId], references: [id])
+  decisions Decision[]
+  createdAt DateTime @default(now())
+}
+
+model Decision {
+  id             String       @id @default(cuid())
+  learnerStateId String
+  learnerState   LearnerState @relation(fields: [learnerStateId], references: [id])
+  action         String
+  createdAt      DateTime     @default(now())
+}
