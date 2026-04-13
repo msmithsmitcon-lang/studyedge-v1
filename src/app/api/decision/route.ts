@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
-    const { learnerStateId } = await req.json();
+    const { learnerStateId, correct } = await req.json();
 
     const learnerState = await prisma.learnerState.findUnique({
       where: { id: learnerStateId },
@@ -15,17 +15,22 @@ export async function POST(req: Request) {
       );
     }
 
-    let action = "next_step";
     let newMastery = learnerState.mastery ?? 0;
 
-    if (newMastery < 2) {
-      action = "repeat";
-      newMastery += 1;
-    } else if (newMastery < 4) {
-      action = "next_step";
+    if (correct === true) {
       newMastery += 1;
     } else {
+      newMastery = Math.max(0, newMastery - 1);
+    }
+
+    let action = "repeat";
+
+    if (newMastery >= 4) {
       action = "review";
+    } else if (newMastery >= 2) {
+      action = "next_step";
+    } else {
+      action = "repeat";
     }
 
     await prisma.learnerState.update({
@@ -43,6 +48,7 @@ export async function POST(req: Request) {
     return Response.json({
       ...decision,
       mastery: newMastery,
+      correct,
     });
   } catch (error) {
     console.error("DECISION_ROUTE_ERROR:", error);
