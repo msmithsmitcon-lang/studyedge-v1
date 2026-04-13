@@ -5,7 +5,7 @@ import { useState } from "react";
 export default function Home() {
   const [result, setResult] = useState("");
 
-  async function runFlow(isCorrect: boolean) {
+  async function runFlow(correct: boolean) {
     try {
       let learnerState: any = null;
 
@@ -52,7 +52,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           learnerStateId: learnerState.id,
-          correct: isCorrect,
+          correct,
         }),
       });
 
@@ -105,10 +105,15 @@ export default function Home() {
         <div style={{ marginTop: "20px" }}>
           <h3>Decision</h3>
           <p>
-            <strong>Action:</strong> {JSON.parse(result).action}
+            <strong>System:</strong>{" "}
+            {JSON.parse(result).action === "repeat" && "Let's try that again."}
+            {JSON.parse(result).action === "next_step" &&
+              "Great, moving forward."}
+            {JSON.parse(result).action === "review" &&
+              "Let's review this concept."}
           </p>
           <p>
-            <strong>Mastery:</strong> {JSON.parse(result).mastery}
+            <strong>Progress:</strong> {JSON.parse(result).mastery} / 5
           </p>
         </div>
       )}
