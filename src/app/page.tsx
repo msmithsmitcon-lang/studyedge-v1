@@ -40,8 +40,7 @@ export default function Home() {
       },
       body: JSON.stringify({
         learnerStateId: learnerState.id,
-        action: "next_step",
-      }),
+              }),
     });
     const decision = await decisionRes.json();
 
