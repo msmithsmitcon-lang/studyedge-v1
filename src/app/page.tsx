@@ -22,16 +22,27 @@ export default function Home() {
     });
     const attempt = await attemptRes.json();
 
-    const learnerStateRes = await fetch("/api/learner-state", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        attemptId: attempt.id,
-      }),
-    });
-    const learnerState = await learnerStateRes.json();
+    let learnerState = null;
+
+    if (!window.localStorage.getItem("learnerStateId")) {
+      const learnerStateRes = await fetch("/api/learner-state", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          attemptId: attempt.id,
+        }),
+      });
+
+      learnerState = await learnerStateRes.json();
+
+      window.localStorage.setItem("learnerStateId", learnerState.id);
+    } else {
+      learnerState = {
+        id: window.localStorage.getItem("learnerStateId"),
+      };
+    }
 
     const decisionRes = await fetch("/api/decision", {
       method: "POST",
@@ -40,7 +51,7 @@ export default function Home() {
       },
       body: JSON.stringify({
         learnerStateId: learnerState.id,
-              }),
+      }),
     });
     const decision = await decisionRes.json();
 
