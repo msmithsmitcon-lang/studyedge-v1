@@ -3,10 +3,22 @@ import { prisma } from "@/lib/prisma";
 export async function POST(req: Request) {
   const { learnerStateId } = await req.json();
 
-  // VERY SIMPLE DECISION ENGINE (V1)
-  const actions = ["next_step", "repeat", "review"];
+  // Count previous decisions for this learner state
+  const previousDecisions = await prisma.decision.count({
+    where: {
+      learnerStateId,
+    },
+  });
 
-  const action = actions[Math.floor(Math.random() * actions.length)];
+  let action = "next_step";
+
+  if (previousDecisions === 0) {
+    action = "next_step";
+  } else if (previousDecisions === 1) {
+    action = "repeat";
+  } else {
+    action = "review";
+  }
 
   const decision = await prisma.decision.create({
     data: {
