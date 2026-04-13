@@ -25,6 +25,7 @@ model LearnerState {
   attemptId String
   attempt   Attempt  @relation(fields: [attemptId], references: [id])
   decisions Decision[]
+  mastery   Int      @default(0)
   createdAt DateTime @default(now())
 }
 
